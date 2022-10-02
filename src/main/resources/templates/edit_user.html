@@ -11,34 +11,43 @@
 <table class="table table-hover">
     <thead class="thead-dark">
     <tr>
+        <th scope="col">Data status</th>
         <th scope="col">Id</th>
         <th scope="col">Name</th>
         <th scope="col">Age</th>
+        <th scope="col">User name</th>
         <th scope="col">Roles</th>
-        <th scope="col">New data</th>
+        <th scope="col">Password</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:object="${user}">
-        <td th:text="${user.getId()}"/>
-        <td th:text="${user.getName()}"/>
-        <td th:text="${user.getAge()}"/>
-        <td th:text="${user.getRoles()}"/>
-        <td>
-            <form method="post" th:action="@{/admin/save}" th:object="${user}">
-                <input type="hidden" th:field="*{id}" readonly="readonly">
-                <input type="text" th:value="*{username}" name="userName" placeholder="New UserName">
-                <input type="text" th:value="*{password}" name="password" placeholder="New password">
-                <input type="text" th:value="*{name}" name="name" placeholder="New Name">
-                <input type="number" th:value="*{age}" name="age" placeholder="New Age">
+    <form method="post" th:action="@{/admin/save}" th:object="${user}">
+        <tr th:object="${user}">
+            <td>Current data</td>
+            <td th:text="${user.getId()}"/>
+            <td th:text="${user.getName()}"/>
+            <td th:text="${user.getAge()}"/>
+            <td th:text="${user.getUserName()}"/>
+            <td th:text="${user.getRoles()}"/>
+            <td th:text="${user.getPassword()}"/>
+        </tr>
+        <tr>
+            <td>New data</td>
+            <td><input type="hidden" th:field="*{id}" readonly="readonly"></td>
+            <td><input type="text" th:value="*{name}" name="name" placeholder="New Name"></td>
+            <td><input type="number" th:value="*{age}" name="age" placeholder="New Age"></td>
+            <td><input type="text" th:value="*{username}" name="userName" placeholder="New UserName"></td>
+            <td>
                 <div th:each="role: ${roles}">
-                    <input type="checkbox" th:name="${role.getRoleName()}" th:checked="${#sets.contains(user.roles, role)}">
+                    <input type="checkbox" th:name="${role.getRoleName()}"
+                           th:checked="${#sets.contains(user.roles, role)}">
                     <label th:text="${role.getRoleName()}"></label>
                 </div>
                 <button type="submit" class="btn btn-primary">Confirm changes</button>
-            </form>
-        </td>
-    </tr>
+            </td>
+            <td><input type="text" th:value="*{password}" name="password" placeholder="New password"></td>
+        </tr>
+    </form>
     </tbody>
 </table>
 <form method="get" th:action="@{/admin}">

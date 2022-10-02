@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private Long id;
 
     private String name;
-    private int age;
+    private Integer age;
     private String userName;
     private String password;
 //        @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_set_id"),
@@ -84,11 +84,11 @@ public class User implements UserDetails {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 

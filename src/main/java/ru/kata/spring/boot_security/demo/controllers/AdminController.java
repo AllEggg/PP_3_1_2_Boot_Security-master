@@ -69,8 +69,9 @@ public class AdminController {
     public String saveUser(@ModelAttribute("user") User user, @RequestParam Map<String, String> form) {
         Set<Role> roleSet = new HashSet<>();
         Set<Role> existRoleSet = roleService.getAllRoles();
-
-        Collection<String> stringRoles = existRoleSet.stream().map(Role::getRoleName).collect(Collectors.toSet());
+        Collection<String> stringRoles = existRoleSet.stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toSet());
 
         for(String field : form.keySet()) {
             if (stringRoles.contains(field)) {
@@ -80,7 +81,11 @@ public class AdminController {
         }
 
         user.setRoles(roleSet);
-        userService.saveUser(user);
+        if (user.getId() == null) {
+            userService.saveUser(user);
+        } else {
+            userService.editUser(user);
+        }
         return "redirect:/admin";
     }
 }
