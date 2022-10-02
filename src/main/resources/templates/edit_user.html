@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<table class="table table-hover">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Age</th>
+        <th scope="col">Roles</th>
+        <th scope="col">New data</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:object="${user}">
+        <td th:text="${user.getId()}"/>
+        <td th:text="${user.getName()}"/>
+        <td th:text="${user.getAge()}"/>
+        <td th:text="${user.getRoles()}"/>
+        <td>
+            <form method="post" th:action="@{/admin/save}" th:object="${user}">
+                <input type="hidden" th:field="*{id}" readonly="readonly">
+                <input type="text" th:value="*{username}" name="userName" placeholder="New UserName">
+                <input type="text" th:value="*{password}" name="password" placeholder="New password">
+                <input type="text" th:value="*{name}" name="name" placeholder="New Name">
+                <input type="number" th:value="*{age}" name="age" placeholder="New Age">
+                <div th:each="role: ${roles}">
+                    <input type="checkbox" th:name="${role.getRoleName()}" th:checked="${#sets.contains(user.roles, role)}">
+                    <label th:text="${role.getRoleName()}"></label>
+                </div>
+                <button type="submit" class="btn btn-primary">Confirm changes</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<form method="get" th:action="@{/admin}">
+    <button type="submit" class="btn btn-primary">Back to users page</button>
+</form>
+</body>
+</html>
