@@ -2,32 +2,37 @@ package ru.kata.spring.boot_security.demo.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import ru.kata.spring.boot_security.demo.services.SecurityUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
+    private final SecurityUserDetailsService detailsService;
+    private final PasswordEncoder encoder;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, SecurityUserDetailsService detailsService, PasswordEncoder encoder) {
         this.successUserHandler = successUserHandler;
+        this.detailsService = detailsService;
+        this.encoder = encoder;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http    .csrf().and().cors().disable()
+        http
                 .authorizeRequests()
                 .antMatchers("/", "/index").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/**").authenticated()
                 .and()
+                .csrf().disable()
                 .formLogin().successHandler(successUserHandler)
                 .permitAll()
                 .and()
@@ -35,27 +40,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-    // аутентификация inMemory
     @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(encoder);
+        daoAuthenticationProvider.setUserDetailsService(detailsService);
+        return daoAuthenticationProvider;
+    }
+
     @Override
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.builder()
-                        .username("user")
-                        .password("$2a$12$T8zq1mnz80ZiccUGjHXIoeJWyXooHhBzBkBqW.5pmJJNikSV2j7DK")
-                        .roles("USER")
-                        .build();
-        UserDetails user2 = User.builder()
-                .username("123")
-                .password("$2a$12$0a8MGSAqF4AOJzhjtD23weoOHqmMz7XQv327VpK7O/jYvC40VJety")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, user2);
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(detailsService)
+                .passwordEncoder(encoder);
     }
 
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(8);
-    }
+
 }

@@ -1,11 +1,35 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <title>Spring Security Example</title>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-<h1>User, welcome spring boot security page!</h1>
-
-
+<div th:insert="~{chips/logout :: logout}"></div>
+<table class="table table-hover">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Age</th>
+        <th scope="col">User name</th>
+        <th scope="col">Roles</th>
+        <th scope="col">Password</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:object="${user}">
+            <td th:text="${user.getId()}"/>
+            <td th:text="${user.getName()}"/>
+            <td th:text="${user.getAge()}"/>
+            <td th:text="${user.getUserName()}"/>
+            <td th:text="${user.getRoles()}"/>
+            <td th:text="${user.getPassword()}"/>
+        </tr>
+    </tbody>
+</table>
 </body>
 </html>

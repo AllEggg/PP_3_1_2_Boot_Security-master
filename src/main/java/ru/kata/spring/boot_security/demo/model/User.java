@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +30,7 @@ public class User implements UserDetails {
     private Integer age;
     private String userName;
     private String password;
-//        @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_set_id"),
-//            inverseJoinColumns = @JoinColumn(name = "roles_id"))
+
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
@@ -120,8 +121,14 @@ public class User implements UserDetails {
         return getAge() == user.getAge() && Objects.equals(getId(), user.getId()) && Objects.equals(getName(), user.getName()) && Objects.equals(userName, user.userName) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getRoles(), user.getRoles());
     }
 
+    public UserDetails fromUser() {
+        return new org.springframework.security.core.userdetails.User(userName, password, getAuthorities());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getName(), getAge(), userName, getPassword(), getRoles());
     }
+
+
 }

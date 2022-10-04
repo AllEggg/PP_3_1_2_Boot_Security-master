@@ -1,25 +1,20 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.kata.spring.boot_security.demo.model.Role;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.security.Principal;
 
 @Controller
+@Secured({"ROLE_USER", "ROLE_ADMIN"})
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -30,36 +25,13 @@ public class UserController {
         this.roleService = roleService;
     }
 
-    @PostMapping("/delete{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
-        return "redirect:/users";
+    @GetMapping
+    public String getPersonalData(Principal principal, Model model) {
+        User enteredUser = userService.findByUsername(principal.getName());
+        model.addAttribute("user", enteredUser);
+        return "user";
+
     }
 
-    @GetMapping("/user_details_form")
-    public String userForm(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("roles", roleService.getAllRoles());
-        return "create_user";
-    }
-
-    @PostMapping("/create")
-    public String createUser(@ModelAttribute("user") User user) {
-//        user.setRoles(roleService.getRoleSet(Arrays.stream(roles).collect(Collectors.toSet())));
-        userService.saveUser(user);
-        return "redirect:/users";
-    }
-
-    @GetMapping("/edit_user_form{id}")
-    public String editUserForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.getUser(id));
-        model.addAttribute("roles", roleService.getAllRoles());
-        return "edit_user";
-    }
-
-    @PostMapping("/edit")
-    public String editUser(@ModelAttribute("user") User user, @RequestParam Map<String, String> form) {
-        userService.editUser(user);
-        return "redirect:/admin";
-    }
 
 }
